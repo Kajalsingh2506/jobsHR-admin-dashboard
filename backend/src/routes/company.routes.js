@@ -14,6 +14,8 @@ router.get(
   c.getDashboardStats
 );
 
+router.get("/company", auth, c.getMyCompany);
+
 router.get("/:id", auth, role("SUPER_ADMIN"), c.getCompanyById);
 
 
@@ -23,5 +25,16 @@ router.patch(
   role("SUPER_ADMIN"),
   c.toggleCompanyStatus
 );
+
+
+
+// // ✅ HR DASHBOARD STATS (Company HR)
+// router.get(
+//   "/hr/dashboard-stats",
+//   auth,
+//   role("HR_ADMIN"),
+//   c.getHRDashboardStats
+// );
+
 
 module.exports = router;

@@ -51,7 +51,12 @@ if (
     sameSite: "lax",
   });
 
-  res.json({ role: user.role });
+  // res.json({ role: user.role });
+  res.json({
+  role: user.role,
+  companyId: user.companyId?._id || user.companyId,
+});
+
 };
 
 exports.logout = (req, res) => {
