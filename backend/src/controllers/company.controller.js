@@ -2,23 +2,22 @@
 const Company = require("../models/Company");
 const User = require("../models/User");
 const Interview = require("../models/Interview");
-// const Job = require("../models/Job"); 
+const Job = require("../models/Job");
 const bcrypt = require("bcryptjs");
 
 // ✅ CREATE COMPANY
 exports.createCompany = async (req, res) => {
   try {
     if (
-  !req.body.hrName ||
-  !req.body.hrEmail ||
-  !req.body.password ||
-  !req.body.companyName
-) {
-  return res.status(400).json({
-    message: "All fields are required",
-  });
-}
-
+      !req.body.hrName ||
+      !req.body.hrEmail ||
+      !req.body.password ||
+      !req.body.companyName
+    ) {
+      return res.status(400).json({
+        message: "All fields are required",
+      });
+    }
 
     // 1️⃣ Check duplicate HR email
     const existingUser = await User.findOne({ email: req.body.hrEmail });
@@ -53,10 +52,7 @@ exports.createCompany = async (req, res) => {
 // ✅ LIST COMPANIES
 exports.listCompanies = async (req, res) => {
   try {
-    const companies = await Company.find().populate(
-      "hrAdminId",
-      "name email"
-    );
+    const companies = await Company.find().populate("hrAdminId", "name email");
 
     res.status(200).json(companies);
   } catch (error) {
@@ -97,8 +93,7 @@ exports.toggleCompanyStatus = async (req, res) => {
     return res.status(404).json({ message: "Company not found" });
   }
 
-  company.status =
-    company.status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
+  company.status = company.status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
 
   await company.save();
 
@@ -110,8 +105,10 @@ exports.toggleCompanyStatus = async (req, res) => {
 
 exports.getCompanyById = async (req, res) => {
   try {
-    const company = await Company.findById(req.params.id)
-      .populate("hrAdminId", "email");
+    const company = await Company.findById(req.params.id).populate(
+      "hrAdminId",
+      "email",
+    );
 
     if (!company) {
       return res.status(404).json({ message: "Company not found" });
@@ -122,7 +119,6 @@ exports.getCompanyById = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch company" });
   }
 };
-
 
 exports.getMyCompany = async (req, res) => {
   try {
@@ -144,40 +140,104 @@ exports.getMyCompany = async (req, res) => {
   }
 };
 
+// ✅ DASHBOARD STATS (HR - Company Specific)
+exports.getHRDashboardStats = async (req, res) => {
+  try {
+    
+    //const companyId = req.user.companyId;
+    const companyId = req.user.companyId._id;
 
-// // ✅ DASHBOARD STATS (HR - Company Specific)
-// exports.getHRDashboardStats = async (req, res) => {
-//   try {
-//     const companyId = req.user.companyId;
 
-//     if (!companyId) {
-//       return res.status(400).json({ message: "Company not found for HR" });
-//     }
+    if (!companyId) {
+      return res.status(400).json({ message: "Company not found for HR" });
+    }
 
-//     const jobs = await Job.countDocuments({ companyId });
+    const jobs = await Job.countDocuments({ companyId });
 
-//     const recruiters = await User.countDocuments({
-//       role: "RECRUITER",
-//       companyId,
-//     });
+    const recruiters = await User.countDocuments({
+      role: "RECRUITER",
+      companyId,
+    });
 
-//     const interviewers = await User.countDocuments({
-//       role: "INTERVIEWER",
-//       companyId,
-//     });
+    const interviewers = await User.countDocuments({
+      role: "INTERVIEWER",
+      companyId,
+    });
 
-//     const interviewsCompleted = await Interview.countDocuments({
-//       companyId,
-//       status: "COMPLETED",
-//     });
+    const interviewsCompleted = await Interview.countDocuments({
+      companyId,
+      status: "COMPLETED",
+    });
 
-//     res.json({
-//       jobs,
-//       recruiters,
-//       interviewers,
-//       interviewsCompleted,
-//     });
-//   } catch (error) {
-//     res.status(500).json({ message: "HR dashboard stats failed" });
-//   }
-// };
+    res.json({
+      jobs,
+      recruiters,
+      interviewers,
+      interviewsCompleted,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "HR dashboard stats failed" });
+  }
+};
+// ✅ UPDATE COMPANY
+exports.updateCompany = async (req, res) => {
+  try {
+    const { name, hrName, hrEmail, password } = req.body;
+
+    const company = await Company.findById(req.params.id);
+    if (!company) {
+      return res.status(404).json({ message: "Company not found" });
+    }
+
+    // update company name
+    if (name) {
+      company.name = name;
+      await company.save();
+    }
+
+    // update HR admin
+    if (company.hrAdminId) {
+      const hr = await User.findById(company.hrAdminId);
+
+      if (hr) {
+        if (hrName) hr.name = hrName;
+        if (hrEmail) hr.email = hrEmail;
+
+        if (password) {
+          const hashed = await bcrypt.hash(password, 10);
+          hr.password = hashed;
+        }
+
+        await hr.save();
+      }
+    }
+
+    res.json({ message: "Company updated successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// ✅ DELETE COMPANY
+exports.deleteCompany = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const company = await Company.findById(id);
+    if (!company) {
+      return res.status(404).json({ message: "Company not found" });
+    }
+
+    // delete HR admin
+    if (company.hrAdminId) {
+      await User.findByIdAndDelete(company.hrAdminId);
+    }
+
+    // delete company
+    await Company.findByIdAndDelete(id);
+
+    res.json({ message: "Company deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

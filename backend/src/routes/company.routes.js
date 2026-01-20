@@ -20,6 +20,21 @@ router.get("/:id", auth, role("SUPER_ADMIN"), c.getCompanyById);
 
 
 router.patch(
+  "/:id",
+  auth,
+  role("SUPER_ADMIN"),
+  c.updateCompany
+);
+
+router.delete(
+  "/:id",
+  auth,
+  role("SUPER_ADMIN"),
+  c.deleteCompany
+);
+
+
+router.patch(
   "/:id/status",
   auth,
   role("SUPER_ADMIN"),

@@ -19,20 +19,23 @@ export default function Login() {
   //   if (res.data.role === "HR_ADMIN") navigate("/hr");
   //   if (res.data.role === "SUPER_ADMIN") navigate("/superadmin");
   // };
-const handleLogin = async () => {
-  try {
-    const res = await api.post("/auth/login", { email, password });
-    setUser(res.data);
+  const handleLogin = async () => {
+    try {
+      const res = await api.post("/auth/login", { email, password });
+      setUser(res.data);
 
-    if (res.data.role === "CANDIDATE") navigate("/candidate");
-    if (res.data.role === "RECRUITER") navigate("/recruiter");
-    if (res.data.role === "INTERVIEWER") navigate("/interviewer");
-    if (res.data.role === "HR_ADMIN") navigate("/hr");
-    if (res.data.role === "SUPER_ADMIN") navigate("/superadmin");
-  } catch (err) {
-    alert(err.response?.data?.message || "Login failed");
-  }
-};
+      localStorage.setItem("role", res.data.role);
+      localStorage.setItem("name", res.data.name);
+
+      if (res.data.role === "CANDIDATE") navigate("/candidate");
+      if (res.data.role === "RECRUITER") navigate("/recruiter");
+      if (res.data.role === "INTERVIEWER") navigate("/interviewer");
+      if (res.data.role === "HR_ADMIN") navigate("/hr");
+      if (res.data.role === "SUPER_ADMIN") navigate("/superadmin");
+    } catch (err) {
+      alert(err.response?.data?.message || "Login failed");
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">

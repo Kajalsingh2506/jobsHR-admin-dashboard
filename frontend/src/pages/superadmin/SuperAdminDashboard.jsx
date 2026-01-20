@@ -97,11 +97,17 @@ export default function SuperAdminDashboard() {
     try {
       if (isEditMode) {
         // UPDATE
-        await api.put(`/companies/${editingCompanyId}`, {
-          companyName: form.companyName,
+        // await api.put(`/companies/${editingCompanyId}`, {
+        //   companyName: form.companyName,
+        //   hrName: form.hrName,
+        //   hrEmail: form.hrEmail,
+        //   ...(form.password && { password: form.password }),
+        // });
+        await api.patch(`/companies/${editingCompanyId}`, {
+          name: form.companyName,
           hrName: form.hrName,
           hrEmail: form.hrEmail,
-          ...(form.password && { password: form.password }),
+          password: form.password || undefined,
         });
 
         alert("Company updated successfully");
@@ -306,6 +312,25 @@ export default function SuperAdminDashboard() {
       hrEmail: "",
       password: "",
     });
+  };
+
+  //ADD DELETE HANDLER
+
+  const handleDeleteCompany = async (companyId) => {
+    const confirm = window.confirm(
+      "Are you sure you want to permanently delete this company?",
+    );
+
+    if (!confirm) return;
+
+    try {
+      await api.delete(`/companies/${companyId}`);
+      await fetchCompanies();
+      await fetchStats();
+      alert("Company deleted successfully");
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to delete company");
+    }
   };
 
   return (
@@ -573,8 +598,12 @@ export default function SuperAdminDashboard() {
 
       {/* ADD COMPANY MODAL */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center">
-          <div className="bg-white p-6 rounded w-96">
+        // <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center">
+
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+          {/* <div className="bg-white p-6 rounded w-96"> */}
+
+          <div className="bg-white p-6 rounded w-96 relative z-50">
             {/* <h2 className="text-lg font-bold mb-4">Add Company</h2> */}
             <h2 className="text-lg font-bold mb-4">
               {isEditMode ? "Edit Company" : "Add Company"}
@@ -637,6 +666,26 @@ export default function SuperAdminDashboard() {
               >
                 {isEditMode ? "Update" : "Create"}
               </button>
+
+              {/* ADD DELETE BUTTON  */}
+
+              {/* <button
+                type="button"
+                onClick={() => handleDeleteCompany(c._id)}
+                className="px-3 py-1 mr-2 rounded bg-red-700 text-white"
+              >
+                Delete
+              </button> */}
+
+              {isEditMode && (
+                <button
+                  type="button"
+                  onClick={() => handleDeleteCompany(editingCompanyId)}
+                  className="px-3 py-1 mr-2 rounded bg-red-700 text-white"
+                >
+                  Delete
+                </button>
+              )}
             </div>
           </div>
         </div>

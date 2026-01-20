@@ -40,11 +40,25 @@ if (
 
 
 
+  // const token = jwt.sign(
+  //   { id: user._id, role: user.role, companyId: user.companyId },
+  //   process.env.JWT_SECRET,
+  //   { expiresIn: "15m" }
+  // );
+
   const token = jwt.sign(
-    { id: user._id, role: user.role, companyId: user.companyId },
-    process.env.JWT_SECRET,
-    { expiresIn: "15m" }
-  );
+  {
+    id: user._id,
+    role: user.role,
+    name: user.name,          // 👈 ADD THIS
+    companyId: user.companyId?._id || null,
+  },
+  process.env.JWT_SECRET,
+  { expiresIn: "15m" }
+);
+
+
+
 
   res.cookie("token", token, {
     httpOnly: true,
@@ -54,6 +68,7 @@ if (
   // res.json({ role: user.role });
   res.json({
   role: user.role,
+   name: user.name,
   companyId: user.companyId?._id || user.companyId,
 });
 
@@ -63,3 +78,12 @@ exports.logout = (req, res) => {
   res.clearCookie("token");
   res.json({ message: "Logged out" });
 };
+
+// exports.me = async (req, res) => {
+//   res.json({
+//     id: req.user.id,
+//     role: req.user.role,
+//     name: req.user.name,
+//     companyId: req.user.companyId,
+//   });
+// };
