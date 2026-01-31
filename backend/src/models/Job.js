@@ -32,6 +32,12 @@ const jobSchema = new mongoose.Schema(
       required: true, // 👈 REQUIRED
     },
 
+    status: {
+      type: String,
+      enum: ["DRAFT", "ACTIVE", "CLOSED"],
+      default: "DRAFT",
+    },
+
     //     applicants: [
     //       {
     //         type: mongoose.Schema.Types.ObjectId,
@@ -65,6 +71,12 @@ const jobSchema = new mongoose.Schema(
           ],
           default: "APPLIED",
         },
+
+        appliedAt: {
+          type: Date,
+          default: Date.now, // ✅ THIS FIXES APPLIED ON
+        },
+
         interviewDate: String,
         interviewTime: String,
         feedback: String,

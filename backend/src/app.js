@@ -23,9 +23,10 @@ app.use("/api/companies", companyRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/interviews", interviewRoutes);
-app.use(errorMiddleware);
 app.use("/api/hr", require("./routes/hr.routes"));
-app.use("/jobs", require("./routes/job.routes"));
+// app.use("/jobs", require("./routes/job.routes"));
+app.use("/api/candidate", require("./routes/candidateProfile.routes")); // ✅ FIXED
 
+app.use(errorMiddleware);
 
 module.exports = app;

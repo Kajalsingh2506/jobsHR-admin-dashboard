@@ -104,7 +104,6 @@
 //   );
 // }
 
-
 // InterviewerDashboard.jsx
 import { useEffect, useState } from "react";
 import api from "../../services/api";
@@ -122,38 +121,43 @@ export default function InterviewerDashboard() {
   }, []);
 
   const submitFeedback = async (i, decision) => {
-    await api.put(
-      `/jobs/${i.jobId}/applicants/${i.candidateId}/feedback`,
-      {
-        feedback,
-        rating,
-        decision,
-      }
-    );
+    await api.put(`/jobs/${i.jobId}/applicants/${i.candidateId}/feedback`, {
+      feedback,
+      rating,
+      decision,
+    });
 
-    // update UI without reload
+    // // update UI without reload
+    // setInterviews((prev) =>
+    //   prev.map((x) =>
+    //     x.jobId === i.jobId && x.candidateId === i.candidateId
+    //       ? { ...x, status: decision }
+    //       : x
+    //   )
+    // );
+
     setInterviews((prev) =>
       prev.map((x) =>
         x.jobId === i.jobId && x.candidateId === i.candidateId
-          ? { ...x, status: decision }
-          : x
-      )
+          ? {
+              ...x,
+              status: decision,
+              feedback,
+              rating,
+            }
+          : x,
+      ),
     );
-
     setFeedback("");
     setRating(0);
   };
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
-      <h1 className="text-2xl font-bold mb-6">
-        Interviewer Dashboard
-      </h1>
+      <h1 className="text-2xl font-bold mb-6">Interviewer Dashboard</h1>
 
       {interviews.length === 0 && (
-        <p className="text-gray-500">
-          No interviews assigned yet
-        </p>
+        <p className="text-gray-500">No interviews assigned yet</p>
       )}
 
       {interviews.map((i) => (
@@ -161,26 +165,30 @@ export default function InterviewerDashboard() {
           key={i.jobId + i.candidateId}
           className="bg-white p-4 rounded shadow mb-4"
         >
-          <h2 className="font-semibold">
-            {i.candidateName}
-          </h2>
+          <h2 className="font-semibold">{i.candidateName}</h2>
 
-          <p className="text-gray-500">
-            Job: {i.jobTitle}
-          </p>
+          <p className="text-gray-500">Job: {i.jobTitle}</p>
 
           <p className="text-sm text-gray-500">
             Interview: {i.interviewDate} @ {i.interviewTime}
           </p>
 
           <p className="mt-1">
-            Status:{" "}
-            <span className="font-medium">
-              {i.status}
-            </span>
+            Status: <span className="font-medium">{i.status}</span>
           </p>
 
-          {i.status === "INTERVIEW_SCHEDULED" && (
+          {i.feedback && (
+            <div className="mt-2 text-sm text-gray-700">
+              <p>
+                <span className="font-semibold">Feedback:</span> {i.feedback}
+              </p>
+              <p>
+                <span className="font-semibold">Rating:</span> {i.rating} / 5
+              </p>
+            </div>
+          )}
+
+          {i.status === "INTERVIEW_SCHEDULED" && !i.feedback &&(
             <>
               <textarea
                 className="border w-full mt-3 p-2"
@@ -225,9 +233,7 @@ function StarRating({ rating, setRating }) {
           key={star}
           onClick={() => setRating(star)}
           className={`cursor-pointer text-xl ${
-            star <= rating
-              ? "text-yellow-400"
-              : "text-gray-300"
+            star <= rating ? "text-yellow-400" : "text-gray-300"
           }`}
         >
           ★

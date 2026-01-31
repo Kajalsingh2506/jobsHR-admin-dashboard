@@ -7,41 +7,17 @@ router.post("/", auth, role("SUPER_ADMIN"), c.createCompany);
 
 router.get("/", auth, role("SUPER_ADMIN"), c.listCompanies);
 
-router.get(
-  "/stats",
-  auth,
-  role("SUPER_ADMIN"),
-  c.getDashboardStats
-);
+router.get("/stats", auth, role("SUPER_ADMIN"), c.getDashboardStats);
 
 router.get("/company", auth, c.getMyCompany);
 
 router.get("/:id", auth, role("SUPER_ADMIN"), c.getCompanyById);
 
+router.patch("/:id", auth, role("SUPER_ADMIN"), c.updateCompany);
 
-router.patch(
-  "/:id",
-  auth,
-  role("SUPER_ADMIN"),
-  c.updateCompany
-);
+router.delete("/:id", auth, role("SUPER_ADMIN"), c.deleteCompany);
 
-router.delete(
-  "/:id",
-  auth,
-  role("SUPER_ADMIN"),
-  c.deleteCompany
-);
-
-
-router.patch(
-  "/:id/status",
-  auth,
-  role("SUPER_ADMIN"),
-  c.toggleCompanyStatus
-);
-
-
+router.patch("/:id/status", auth, role("SUPER_ADMIN"), c.toggleCompanyStatus);
 
 // // ✅ HR DASHBOARD STATS (Company HR)
 // router.get(
@@ -50,6 +26,5 @@ router.patch(
 //   role("HR_ADMIN"),
 //   c.getHRDashboardStats
 // );
-
 
 module.exports = router;

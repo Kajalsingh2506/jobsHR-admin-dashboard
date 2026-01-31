@@ -11,7 +11,9 @@ import InterviewerDashboard from "./pages/interviewer/InterviewerDashboard";
 import HRDashboard from "./pages/hr/HRDashboard";
 import SuperAdminDashboard from "./pages/superadmin/SuperAdminDashboard";
 import CompanyDetails from "./pages/superadmin/CompanyDetails";
+import CandidateProfile from "./pages/candidate/CandidateProfile";
 
+import JobApplicants from "./pages/recruiter/JobApplicants";
 
 export default function App() {
   return (
@@ -27,6 +29,15 @@ export default function App() {
               element={
                 <ProtectedRoute roles={["CANDIDATE"]}>
                   <CandidateDashboard />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/candidate/profile"
+              element={
+                <ProtectedRoute roles={["CANDIDATE"]}>
+                  <CandidateProfile />
                 </ProtectedRoute>
               }
             />
@@ -68,12 +79,21 @@ export default function App() {
             />
             <Route
               path="/superadmin/companies/:id"
-               element={
-              <ProtectedRoute roles={["SUPER_ADMIN"]}>
-               <CompanyDetails />
-               </ProtectedRoute>
-                }
-               />
+              element={
+                <ProtectedRoute roles={["SUPER_ADMIN"]}>
+                  <CompanyDetails />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/recruiter/jobs/:jobId/applicants"
+              element={
+                <ProtectedRoute roles={["RECRUITER"]}>
+                  <JobApplicants />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </MainLayout>
       </BrowserRouter>

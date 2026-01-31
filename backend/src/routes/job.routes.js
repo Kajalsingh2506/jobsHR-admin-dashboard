@@ -25,7 +25,7 @@
 const router = require("express").Router();
 const auth = require("../middleware/authMiddleware");
 const role = require("../middleware/roleMiddleware");
-const c = require("../controllers/job.controller");
+const c = require("../controllers/job.controllers");
 
 // CREATE JOB (RECRUITER ONLY)
 router.post("/", auth, role("RECRUITER"), c.createJob);
@@ -64,16 +64,14 @@ router.get(
   "/interviewer/my-interviews",
   auth,
   role("INTERVIEWER"),
-  jobController.getMyInterviews
+  c.getMyInterviews
 );
 
 router.put(
   "/:jobId/applicants/:candidateId/feedback",
   auth,
   role("INTERVIEWER"),
-  jobController.submitInterviewFeedback
+  c.submitInterviewFeedback
 );
-
-
 
 module.exports = router;
